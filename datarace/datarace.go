@@ -29,7 +29,8 @@ func main() {
 	fmt.Println("Final counter value:", counter)
 }
 
-// fix for data race
+// Fix for data race
+
 // package main
 
 // import (
