@@ -1,4 +1,5 @@
 // go run -race synchronization/waitgroup/mutex.go
+
 package main
 
 import (
