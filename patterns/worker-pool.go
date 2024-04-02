@@ -3,31 +3,37 @@ package main
 import "fmt"
 
 func main() {
-	tasks := make(chan string, 10)
-	results := make(chan string, 10)
+	chJobs := make(chan int, 50)
+	chResults := make(chan int, 50)
 
-	// Create worker pool
-	for i := 1; i <= 3; i++ {
-		go worker(i, tasks, results)
+	// each go routine will pull jobs from chJobs
+	go worker(chJobs, chResults)
+	go worker(chJobs, chResults)
+	go worker(chJobs, chResults)
+
+	for i := 0; i < 50; i++ {
+		chJobs <- i
 	}
 
-	// Send tasks to workers
-	for i := 1; i <= 10; i++ {
-		tasks <- fmt.Sprintf("Task %d", i)
+	for i := 0; i < 50; i++ {
+		fmt.Println(<-chResults)
 	}
 
-	close(tasks)
+}
 
-	// Collect results
-	for i := 1; i <= 10; i++ {
-		result := <-results
-		fmt.Println(result)
+func worker(jobs <-chan int, results chan<- int) {
+	for n := range jobs {
+		results <- fib(n)
 	}
 }
 
-func worker(id int, tasks <-chan string, results chan<- string) {
-	for task := range tasks {
-		result := fmt.Sprintf("Worker %d processed %s", id, task)
-		results <- result
+func fib(n int) int {
+	if n == 0 {
+		return 0
 	}
+	if n == 1 {
+		return 1
+	}
+
+	return fib(n-1) + fib(n-2)
 }
